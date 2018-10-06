@@ -99,21 +99,21 @@ proc makeUnpacker(typename: NimNode, scalars: NimNode, pointers: NimNode, bools:
     let offset = p[1]
     let default = p[2]
     let condition = p[3]
-    body.add(newCall(!"capnpUnpackScalarMember", newComplexDotExpr(resultId, name), offset, default, condition))
+    body.add(newCall(newIdentNode("capnpUnpackScalarMember"), newComplexDotExpr(resultId, name), offset, default, condition))
 
   for p in bools:
     let name = p[0]
     let offset = p[1]
     let default = p[2]
     let condition = p[3]
-    body.add(newCall(!"capnpUnpackBoolMember", newComplexDotExpr(resultId, name), offset, default, condition))
+    body.add(newCall(newIdentNode("capnpUnpackBoolMember"), newComplexDotExpr(resultId, name), offset, default, condition))
 
   for p in pointers:
     let name = p[0]
     let offset = p[1]
     let flag = p[2]
     let condition = p[3]
-    body.add(newCall(!"capnpUnpackPointerMember", newComplexDotExpr(resultId, name), offset, flag, condition))
+    body.add(newCall(newIdentNode("capnpUnpackPointerMember"), newComplexDotExpr(resultId, name), offset, flag, condition))
 
 proc makePacker(typename: NimNode, scalars: NimNode, pointers: NimNode, bools: NimNode): NimNode {.compiletime.} =
   # bufferM should be named buffer, but compiler manages to confuse it with buffer proc in unpack
@@ -132,7 +132,7 @@ proc makePacker(typename: NimNode, scalars: NimNode, pointers: NimNode, bools: N
 
   for p in bools:
     let offset = p[1]
-    sizesList.add(newCall(!"int", newLit((offset.intVal + 8) div 8)))
+    sizesList.add(newCall(newIdentNode("int"), newLit((offset.intVal + 8) div 8)))
 
   for p in scalars:
     let name = p[0]
@@ -140,7 +140,7 @@ proc makePacker(typename: NimNode, scalars: NimNode, pointers: NimNode, bools: N
     let default = p[2]
     let condition = p[3]
 
-    body.add(newCall(!"capnpPackScalarMember", newComplexDotExpr(valueId, name), offset, default, condition))
+    body.add(newCall(newIdentNode("capnpPackScalarMember"), newComplexDotExpr(valueId, name), offset, default, condition))
 
   for p in bools:
     let name = p[0]
@@ -148,18 +148,18 @@ proc makePacker(typename: NimNode, scalars: NimNode, pointers: NimNode, bools: N
     let default = p[2]
     let condition = p[3]
 
-    body.add(newCall(!"capnpPackBoolMember", newComplexDotExpr(valueId, name), offset, default, condition))
+    body.add(newCall(newIdentNode("capnpPackBoolMember"), newComplexDotExpr(valueId, name), offset, default, condition))
 
-  body.add(newCall(!"capnpPreparePack"))
+  body.add(newCall(newIdentNode("capnpPreparePack")))
 
   for p in pointers:
     let name = p[0]
     let offset = p[1]
     let condition = p[3]
 
-    body.add(newCall(!"capnpPreparePackPointer", newComplexDotExpr(valueId, name), offset, condition))
+    body.add(newCall(newIdentNode("capnpPreparePackPointer"), newComplexDotExpr(valueId, name), offset, condition))
 
-  body.add(newCall(!"capnpPreparePackFinish"))
+  body.add(newCall(newIdentNode("capnpPreparePackFinish")))
 
   for p in pointers:
     let name = p[0]
@@ -167,7 +167,7 @@ proc makePacker(typename: NimNode, scalars: NimNode, pointers: NimNode, bools: N
     let flag = p[2]
     let condition = p[3]
 
-    body.add(newCall(!"capnpPackPointer", newComplexDotExpr(valueId, name), offset, flag, condition))
+    body.add(newCall(newIdentNode("capnpPackPointer"), newComplexDotExpr(valueId, name), offset, flag, condition))
 
   body.add(parseStmt("capnpPackFinish()"))
 
@@ -183,7 +183,7 @@ proc makeGetPointerField(typename: NimNode, pointers: NimNode): NimNode {.compil
     let offset = p[1]
     let condition = p[3]
 
-    body.add(newCall(!"capnpGetPointerField", newComplexDotExpr(newIdentNode("self"), name), offset, condition))
+    body.add(newCall(newIdentNode("capnpGetPointerField"), newComplexDotExpr(newIdentNode("self"), name), offset, condition))
 
 macro makeStructCoders*(typeName, scalars, pointers, bitfields): untyped =
   newNimNode(nnkStmtList)

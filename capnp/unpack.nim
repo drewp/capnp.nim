@@ -226,7 +226,7 @@ proc unpackListImpl[T, Target](self: Unpacker, offset: int, typ: typedesc[T], ta
   if typeTag == 2:
     return unpackInterSegment(self, pointer, Target)
   if pointer == 0:
-    return nil
+    return
 
   if typeTag != 1:
     raise newException(CapnpFormatError, "expected list, found " & $typeTag)
@@ -336,7 +336,6 @@ proc unpackPointer*[T](self: Unpacker, offset: int, typ: typedesc[T]): T =
     return unpackPointerHook(self, offset, typ)
 
 proc postprocessText(t: string): string =
-  if t == nil: return nil
   if t.len == 0 or t[^1] != '\0':
     raise newException(CapnpFormatError, "text without trailing zero")
   return t[0..(t.len-2)]

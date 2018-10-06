@@ -7,5 +7,5 @@ license       = "MIT"
 bin           = "capnp/capnpc"
 
 [Deps]
-Requires: "nim >= 0.12.0"
+Requires: "nim >= 0.19.0"
 Requires: "collections >= 0.1.2"

@@ -37,7 +37,6 @@ proc getSizeTag(s: int): int {.compiletime.} =
     else: doAssert(false, "bad size")
 
 proc packScalarList[T, R](p: Packer, offset: int, value: T, typ: typedesc[R]) =
-  assert p.buffer != nil
   let bodyOffset = p.buffer.len
   assert bodyOffset mod 8 == 0
 
@@ -124,8 +123,6 @@ proc packCompositeList[R](p: Packer, offset: int, value: seq[R], typ: typedesc[R
        (pointerCount.uint64 shl 48))
 
 proc packListImpl[T, R](p: Packer, offset: int, value: T, typ: typedesc[R]) =
-  if value.isNil:
-    return
   when typ is CapnpScalar:
     packScalarList(p, offset, value, typ)
   elif typ is (seq|string) or compiles(toCapServer(value[0])):
@@ -134,6 +131,8 @@ proc packListImpl[T, R](p: Packer, offset: int, value: T, typ: typedesc[R]) =
     packCompositeList(p, offset, value, typ)
 
 proc packList*[T](p: Packer, offset: int, value: seq[T]) =
+  if value.isNil:
+    return
   packListImpl(p, offset, value, T)
 
 proc packList*(p: Packer, offset: int, value: string) =
@@ -181,8 +180,7 @@ proc packPointer*[T](p: Packer, offset: int, value: T) =
     packPointerHook(p, offset, value)
 
 proc preprocessText(v: string): string =
-  if v == nil: return v
-  else: return v & "\0"
+   return v & "\0"
 
 proc preprocessText[T](v: seq[T]): seq[T] =
   if v == nil:

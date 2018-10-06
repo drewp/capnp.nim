@@ -78,8 +78,6 @@ proc trimWords*(s: var string, minSize=0) =
     s &= newZeroString(minSize - s.len)
 
 proc insertAt*(s: var string, offset: int, data: string) =
-  assert s != nil
-
   if offset < 0:
     raise newException(IndexError, "offset < 0")
   if s.len < offset + data.len:
